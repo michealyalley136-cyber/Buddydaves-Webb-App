@@ -1,0 +1,14 @@
+node_modules
+.next
+dist
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+DEFAULT_LOGINS.txt
+**/DEFAULT_LOGINS.txt
+Buddy-Daves-Logins.txt
+coverage
+.turbo
+.vercel

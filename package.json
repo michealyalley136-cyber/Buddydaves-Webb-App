@@ -1,0 +1,20 @@
+{
+  "name": "buddy-daves-monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "npx concurrently -n web,api -c cyan,magenta \"npm run dev -w web\" \"npm run dev -w server\"",
+    "dev:clean": "powershell -NoProfile -Command \"$ports=3000,4000; foreach ($p in $ports) { Get-NetTCPConnection -LocalPort $p -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue } }; if (Test-Path web/.next) { Remove-Item -Recurse -Force web/.next }\" && npm run dev",
+    "dev:web": "npm run dev -w web",
+    "build": "npm run build -w server && npm run build -w web",
+    "db:generate": "npm run db:generate -w server",
+    "db:push": "npm run db:push -w server",
+    "db:seed": "npm run db:seed -w server"
+  },
+  "workspaces": [
+    "web",
+    "server"
+  ],
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

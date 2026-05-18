@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  customer
+  staff
+  admin
+}
+
+enum OrderType {
+  pickup
+  drive_thru
+}
+
+enum OrderStatus {
+  PENDING
+  PREPARING
+  READY
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  name         String
+  role         Role       @default(customer)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  auditLogs    AuditLog[]
+}
+
+model MenuCategory {
+  id        String     @id @default(cuid())
+  name      String
+  slug      String     @unique
+  sortOrder Int        @default(0)
+  active    Boolean    @default(true)
+  items     MenuItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model MenuItem {
+  id           String       @id @default(cuid())
+  categoryId String
+  category     MenuCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name         String
+  description  String?
+  priceCents   Int
+  imageUrl     String?
+  active       Boolean      @default(true)
+  sortOrder    Int          @default(0)
+  orderItems   OrderItem[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([categoryId])
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  code         String      @unique
+  status       OrderStatus @default(PENDING)
+  orderType    OrderType
+  customerName String
+  phone        String
+  pickupTime   String?
+  notes        String?
+  totalCents   Int
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  items        OrderItem[]
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id         String   @id @default(cuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  name       String
+  priceCents Int
+  quantity   Int      @default(1)
+
+  @@index([orderId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  entity    String?
+  entityId  String?
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
