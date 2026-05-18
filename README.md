@@ -304,5 +304,3 @@ Run migrations with `npx prisma migrate deploy` in the server service when you a
 
 
 Private project for Buddy Dave's — adjust as needed.
-
-
