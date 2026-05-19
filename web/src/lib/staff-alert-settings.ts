@@ -174,6 +174,10 @@ export const STAFF_ALERT_MODE_OPTIONS: { id: StaffAlertMode; label: string; hint
   },
 ];
 
+export function getAlertSoundLabel(soundId: StaffAlertSoundId): string {
+  return STAFF_ALERT_SOUND_OPTIONS.find((o) => o.id === soundId)?.label ?? soundId;
+}
+
 export const STAFF_ALERT_SOUND_OPTIONS: { id: StaffAlertSoundId; label: string }[] = [
   { id: "kitchen-buzzer-strong", label: "Kitchen buzzer — strong (recommended)" },
   { id: "buddy-daves-announcement", label: "Order announcement" },

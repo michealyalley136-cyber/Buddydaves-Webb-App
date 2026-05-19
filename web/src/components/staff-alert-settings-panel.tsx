@@ -4,7 +4,6 @@ import Link from "next/link";
 import clsx from "clsx";
 import {
   STAFF_ALERT_MODE_OPTIONS,
-  STAFF_ALERT_SOUND_OPTIONS,
   clearAlertMute,
   getMuteRemainingMs,
   isAlertsMuted,
@@ -13,6 +12,7 @@ import {
   type StaffAlertSettings,
 } from "@/lib/staff-alert-settings";
 import { useStaffAlerts } from "@/context/staff-alerts-context";
+import { StaffAlertSoundPicker } from "@/components/staff-alert-sound-picker";
 
 export function StaffAlertSettingsPanel() {
   const {
@@ -152,25 +152,7 @@ export function StaffAlertSettingsPanel() {
 
         {settings.enabled && (
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            <label className="block text-xs font-bold uppercase tracking-wide text-white/55">
-              Alert sound
-              <select
-                value={settings.soundId}
-                onChange={(e) =>
-                  persistSettings({
-                    ...settings,
-                    soundId: e.target.value as StaffAlertSettings["soundId"],
-                  })
-                }
-                className="mt-2 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-2.5 text-sm text-white"
-              >
-                {STAFF_ALERT_SOUND_OPTIONS.map((o) => (
-                  <option key={o.id} value={o.id}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <StaffAlertSoundPicker needsUnlock={soundMode && !audioUnlocked} />
             <label className="block text-xs font-bold uppercase tracking-wide text-white/55">
               Alert volume only · {Math.round(settings.alertVolume * 100)}%
               <input

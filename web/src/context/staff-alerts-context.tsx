@@ -19,6 +19,7 @@ import {
   vibrateAlert,
 } from "@/lib/staff-alert-notify";
 import {
+  getAlertSoundLabel,
   getEffectiveAlertVolume,
   isAudioUnlockedSession,
   isAlertsMuted,
@@ -29,6 +30,7 @@ import {
   wantsSound,
   wantsPopup,
   type StaffAlertSettings,
+  type StaffAlertSoundId,
 } from "@/lib/staff-alert-settings";
 
 const DEFAULT_ALERT_SETTINGS: StaffAlertSettings = {
@@ -56,6 +58,8 @@ type StaffAlertsContextValue = {
   testResult: TestAlertResult;
   clearTestResult: () => void;
   showTestVisualFlash: boolean;
+  previewSound: (soundId: StaffAlertSoundId) => Promise<void>;
+  assignSound: (soundId: StaffAlertSoundId) => void;
 };
 
 const StaffAlertsContext = createContext<StaffAlertsContextValue | null>(null);
@@ -234,6 +238,57 @@ export function StaffAlertsProvider({ children }: { children: React.ReactNode })
 
   const clearTestResult = useCallback(() => setTestResult(null), []);
 
+  const previewSound = useCallback(
+    async (soundId: StaffAlertSoundId) => {
+      if (soundId === "silent") {
+        setTestResult({
+          ok: true,
+          message: "Silent — no sound will play. Select to use visual or pop-up alerts only.",
+        });
+        return;
+      }
+
+      const vol = getEffectiveAlertVolume(settings);
+      let unlocked = audioUnlocked || isAudioUnlockedSession();
+      if (!unlocked) {
+        const unlock = await unlockStaffAlertAudio(soundId, vol);
+        unlocked = unlock.ok;
+        if (unlocked) {
+          setAudioUnlockedSession();
+          setAudioUnlocked(true);
+        }
+      }
+
+      if (!unlocked) {
+        setTestResult({ ok: false, message: 'Click "Enable sound" first.' });
+        return;
+      }
+
+      const played = await playStaffAlertSound(soundId, vol, {
+        kitchenBoost: settings.kitchenMode,
+      });
+      setTestResult({
+        ok: played.ok,
+        message: played.ok
+          ? `Preview: ${getAlertSoundLabel(soundId)}`
+          : played.detail,
+      });
+    },
+    [settings, audioUnlocked]
+  );
+
+  const assignSound = useCallback(
+    (soundId: StaffAlertSoundId) => {
+      const next = { ...settings, soundId };
+      persistSettings(next);
+      setTestResult({
+        ok: true,
+        message: `Saved — ${getAlertSoundLabel(soundId)} is now your alert sound on this device.`,
+      });
+    },
+    [settings, persistSettings]
+  );
+
   const value = useMemo(
     () => ({
       settings,
@@ -248,6 +303,8 @@ export function StaffAlertsProvider({ children }: { children: React.ReactNode })
       testResult,
       clearTestResult,
       showTestVisualFlash,
+      previewSound,
+      assignSound,
     }),
     [
       settings,
@@ -262,6 +319,8 @@ export function StaffAlertsProvider({ children }: { children: React.ReactNode })
       testResult,
       clearTestResult,
       showTestVisualFlash,
+      previewSound,
+      assignSound,
     ]
   );
 
