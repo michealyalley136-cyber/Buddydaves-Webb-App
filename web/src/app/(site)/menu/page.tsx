@@ -32,7 +32,7 @@ export default function MenuPage() {
             .filter((c) => c.items.length > 0)
         )
       )
-      .catch(() => setErr("We couldn’t load the menu. Check your connection and try again."));
+      .catch(() => setErr("We couldn't load the menu. Check your connection and try again."));
   }, []);
 
   const pills = useMemo(() => {
@@ -50,46 +50,46 @@ export default function MenuPage() {
 
   return (
     <>
-    <div className={count > 0 ? "layout-page pb-28" : "layout-page"}>
-      <div className="max-w-2xl">
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-teal">Menu</p>
-        <h1 className="mt-2 font-display text-5xl text-[var(--brand-brown)] md:text-6xl">Order your favorites</h1>
-        <p className="mt-4 text-ink/70">
-          Pickup or drive-thru — pay in store when you arrive. Five house favorites, ready to order.
-        </p>
-        <OwnerPendingNote variant="banner">{PHOTOS_PENDING_NOTE}</OwnerPendingNote>
-      </div>
-      <div className="mt-8">
-        <CategoryPills pills={pills} active={active} onChange={setActive} />
-      </div>
-      {err && (
-        <p className="mt-8 rounded-2xl border border-[var(--accent-red)]/30 bg-[color-mix(in_oklab,var(--accent-red)_10%,white)] px-4 py-3 text-sm text-[var(--accent-red)]">
-          {err}
-        </p>
-      )}
-      {!data && !err && <MenuGridSkeleton />}
-      {data && items.length === 0 && (
-        <p className="mt-10 rounded-2xl border border-[var(--line-subtle)] bg-[var(--card-bg)] px-5 py-8 text-center text-sm text-ink/70">
-          No items in this category right now. Try &ldquo;All&rdquo; to see the full menu.
-        </p>
-      )}
-      {data && items.length > 0 && (
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((i) => (
-            <MenuItemCard
-              key={i.id}
-              id={i.id}
-              name={i.name}
-              description={i.description}
-              price={i.price}
-              imageUrl={i.imageUrl}
-              pendingNote={getMenuItemPendingNote(i.name)}
-            />
-          ))}
+      <div className={count > 0 ? "layout-page pb-28" : "layout-page"}>
+        <div className="max-w-2xl">
+          <p className="eyebrow">Menu</p>
+          <h1 className="page-title">Order online</h1>
+          <p className="page-lead">
+            Select your items below. Pay in store when you pick up or use the drive-thru.
+          </p>
+          <OwnerPendingNote variant="banner">{PHOTOS_PENDING_NOTE}</OwnerPendingNote>
         </div>
-      )}
-    </div>
-    <MenuCartBar />
+        <div className="mt-8">
+          <CategoryPills pills={pills} active={active} onChange={setActive} />
+        </div>
+        {err && (
+          <p className="mt-8 rounded-lg border border-[var(--accent-red)]/25 bg-[color-mix(in_oklab,var(--accent-red)_8%,white)] px-4 py-3 text-sm text-[var(--accent-red)]">
+            {err}
+          </p>
+        )}
+        {!data && !err && <MenuGridSkeleton />}
+        {data && items.length === 0 && (
+          <p className="mt-10 rounded-lg border border-[var(--line-subtle)] bg-white px-5 py-8 text-center text-sm text-[var(--text-muted)]">
+            No items in this category. Select &ldquo;All&rdquo; to see the full menu.
+          </p>
+        )}
+        {data && items.length > 0 && (
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {items.map((i) => (
+              <MenuItemCard
+                key={i.id}
+                id={i.id}
+                name={i.name}
+                description={i.description}
+                price={i.price}
+                imageUrl={i.imageUrl}
+                pendingNote={getMenuItemPendingNote(i.name)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+      <MenuCartBar />
     </>
   );
 }

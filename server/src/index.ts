@@ -10,14 +10,28 @@ import { authRouter } from "./routes/auth.js";
 
 const app = express();
 const port = Number(process.env.PORT) || 4000;
-const corsOrigin =
-  process.env.NODE_ENV === "production"
-    ? (process.env.CORS_ORIGIN?.split(",").map((s) => s.trim()).filter(Boolean) ?? true)
-    : true;
+const host = process.env.HOST ?? "0.0.0.0";
+
+function resolveCorsOrigin(): boolean | string[] {
+  if (process.env.NODE_ENV !== "production") {
+    return true;
+  }
+  const origins =
+    process.env.CORS_ORIGIN?.split(",")
+      .map((s) => s.trim())
+      .filter(Boolean) ?? [];
+  if (origins.length === 0) {
+    console.warn(
+      "[cors] CORS_ORIGIN is empty in production — cross-origin browser calls to this API will be blocked. Set CORS_ORIGIN to your web app URL(s), comma-separated."
+    );
+    return false;
+  }
+  return origins;
+}
 
 app.use(
   cors({
-    origin: corsOrigin,
+    origin: resolveCorsOrigin(),
     credentials: true,
   })
 );
@@ -34,6 +48,16 @@ app.use((_req, res) => {
   res.status(404).json({ error: "Not found" });
 });
 
-app.listen(port, () => {
-  console.log(`Buddy Dave's API listening on :${port}`);
+const server = app.listen(port, host, () => {
+  console.log(`Buddy Dave's API listening on ${host}:${port}`);
+});
+
+server.on("error", (err: NodeJS.ErrnoException) => {
+  if (err.code === "EADDRINUSE") {
+    console.error(
+      `Port ${port} is already in use. Stop the other process or run "npm run dev:clean" from the repo root.`
+    );
+    process.exit(1);
+  }
+  throw err;
 });

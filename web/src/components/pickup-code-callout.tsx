@@ -13,23 +13,23 @@ export function PickupCodeCallout({
     orderType === "drive_thru"
       ? "drive-thru window"
       : orderType === "pickup"
-        ? "pickup counter or curbside"
-        : "pickup counter or drive-thru window";
+        ? "pickup counter"
+        : "pickup counter or drive-thru";
 
   return (
     <div
       className={clsx(
-        "rounded-2xl border-2 border-[var(--brand-gold)] bg-[color-mix(in_oklab,var(--brand-gold)_22%,white)] px-5 py-5 text-center shadow-diner ring-1 ring-[var(--brand-gold)]/35",
+        "rounded-xl border-2 border-[var(--brand-teal)]/30 bg-[color-mix(in_oklab,var(--brand-teal)_6%,white)] px-5 py-6 text-center",
         className
       )}
     >
-      <p className="text-xs font-bold uppercase tracking-[0.28em] text-teal">Show this code</p>
-      <p className="mt-2 font-display text-4xl tracking-wide text-[var(--brand-brown)] sm:text-5xl">
+      <p className="text-xs font-semibold uppercase tracking-wider text-teal">Your order code</p>
+      <p className="mt-2 font-mono text-3xl font-bold tracking-wide text-[var(--brand-brown)] sm:text-4xl">
         {code}
       </p>
-      <p className="mt-3 text-sm font-semibold leading-relaxed text-ink/80">
-        Have this ready at the <span className="text-[var(--brand-brown)]">{where}</span> when you
-        arrive. Pay in store — cash or card.
+      <p className="mt-3 text-sm text-[var(--text-muted)]">
+        Show this code at the <span className="font-medium text-[var(--brand-brown)]">{where}</span>.
+        Pay in store when you arrive.
       </p>
     </div>
   );

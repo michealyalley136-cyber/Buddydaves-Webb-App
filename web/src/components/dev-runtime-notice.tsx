@@ -11,9 +11,14 @@ export function DevRuntimeNotice() {
     >
       <p className="font-bold">Development mode</p>
       <p className="mt-1">
-        Open the URL from your terminal (e.g. <strong>http://localhost:3000</strong>). If the page is
-        blank, stop all Node processes, run <code className="rounded bg-amber-200 px-1">npm run dev</code>,
-        then hard-refresh (<kbd className="rounded bg-amber-200 px-1">Ctrl+Shift+R</kbd>).
+        Open <strong>http://localhost:3000</strong> from the terminal. If the screen is blank, run{" "}
+        <code className="rounded bg-amber-200 px-1">npm run dev:clean</code>, then hard-refresh (
+        <kbd className="rounded bg-amber-200 px-1">Ctrl+Shift+R</kbd>).
+      </p>
+      <p className="mt-2 text-xs text-amber-900/90">
+        Do not run <code className="rounded bg-amber-200 px-1">npm run build</code> while{" "}
+        <code className="rounded bg-amber-200 px-1">npm run dev</code> is running — it corrupts the cache and
+        causes a blank page.
       </p>
     </div>
   );

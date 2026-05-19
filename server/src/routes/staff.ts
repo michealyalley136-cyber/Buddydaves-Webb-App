@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { z } from "zod";
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus, OrderType } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
 import { requireAuth, type AuthedRequest } from "../middleware/auth.js";
 import { writeAudit } from "../lib/audit.js";
+import { generateOrderCode } from "../lib/orderCode.js";
 
 export const staffRouter = Router();
 
@@ -19,7 +20,7 @@ staffRouter.get(
 
     const orders = await prisma.order.findMany({
       where,
-      orderBy: { createdAt: "asc" },
+      orderBy: { createdAt: view === "completed" ? "desc" : "desc" },
       include: { items: true },
       take: 200,
     });
@@ -78,5 +79,67 @@ staffRouter.patch(
       meta: { from: order.status, to: next },
     });
     res.json({ id: updated.id, code: updated.code, status: updated.status });
+  }
+);
+
+/** Demo / kitchen trial — creates a pending order for presentation. */
+staffRouter.post(
+  "/demo-order",
+  requireAuth("staff", "admin"),
+  async (req, res) => {
+    const item = await prisma.menuItem.findFirst({
+      where: { active: true },
+      orderBy: { sortOrder: "asc" },
+    });
+    if (!item) {
+      res.status(400).json({ error: "No active menu items to demo" });
+      return;
+    }
+
+    const code = await generateOrderCode();
+    const order = await prisma.order.create({
+      data: {
+        code,
+        orderType: OrderType.pickup,
+        customerName: "Demo Customer",
+        phone: "(865) 555-0100",
+        pickupTime: "ASAP",
+        notes: "Kitchen demo order — safe to complete or cancel",
+        totalCents: item.priceCents,
+        status: OrderStatus.PENDING,
+        items: {
+          create: [
+            {
+              menuItemId: item.id,
+              name: item.name,
+              priceCents: item.priceCents,
+              quantity: 1,
+            },
+          ],
+        },
+      },
+      include: { items: true },
+    });
+
+    const user = (req as AuthedRequest).user;
+    await writeAudit(user?.id, "order.demo_created", {
+      entity: "Order",
+      entityId: order.id,
+      meta: { code: order.code },
+    });
+
+    res.status(201).json({
+      id: order.id,
+      code: order.code,
+      status: order.status,
+      orderType: order.orderType,
+      customerName: order.customerName,
+      phone: order.phone,
+      pickupTime: order.pickupTime,
+      notes: order.notes,
+      total: order.totalCents / 100,
+      createdAt: order.createdAt,
+      itemCount: order.items.reduce((n, i) => n + i.quantity, 0),
+    });
   }
 );

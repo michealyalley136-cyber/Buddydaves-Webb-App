@@ -15,31 +15,31 @@ const features: {
 }[] = [
   {
     title: "Philly Cheesesteak",
-    body: "Provolone cheese with seasoned grilled peppers and onions — a Sevierville staple.",
+    body: "Provolone cheese with seasoned grilled peppers and onions.",
     img: MENU_IMAGES.phillyCheesesteak,
     price: "$7.99",
   },
   {
     title: "Double Mushroom Melt",
-    body: "Stacked, melty, and built for the drive home — one of our signature sandwiches.",
+    body: "Stacked, melty, and built for the drive home.",
     img: MENU_IMAGES.doubleMushroomMelt,
     price: "$7.69",
   },
   {
     title: "Cheese Curds",
-    body: "Golden, crispy curds — the side everyone asks for by name.",
+    body: "Golden, crispy curds — a customer favorite side.",
     img: MENU_IMAGES.cheeseCurds,
     price: "$5.99",
   },
   {
     title: "Gallon Fresh Made Rootbeer",
-    body: "Fresh made rootbeer by the gallon — perfect for the porch or the picnic table.",
+    body: "Fresh-made root beer by the gallon for gatherings.",
     img: MENU_IMAGES.gallonRootbeer,
     price: "$7.99",
   },
   {
     title: "Rootbeer Float",
-    body: "Rootbeer made fresh daily, crowned with creamy soft-serve.",
+    body: "Fresh root beer crowned with creamy soft-serve.",
     img: MENU_IMAGES.rootbeerFloat,
     price: "$4.99",
     pendingNote: getMenuItemPendingNote("Rootbeer Float"),
@@ -50,50 +50,49 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <section className="mx-auto max-w-6xl px-4 py-12 sm:py-16 md:px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-teal">On the menu now</p>
-          <h2 className="mt-3 font-display text-3xl text-[var(--brand-brown)] sm:text-4xl md:text-5xl">
-            Sandwiches, sides &amp; root beer
-          </h2>
-          <p className="mt-4 text-balance text-sm text-ink/70 sm:text-base">
-            Five house favorites — sandwiches, sides, and fresh root beer. Order pickup or swing
-            through the drive-thru.
+      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 md:py-20">
+        <div className="max-w-2xl">
+          <p className="eyebrow">On the menu</p>
+          <h2 className="page-title">House favorites</h2>
+          <p className="page-lead !mt-3">
+            Five signature items available for pickup or drive-thru. Order online and pay when you
+            arrive.
           </p>
-          <OwnerPendingNote variant="banner" className="mx-auto mt-4 max-w-lg">
+          <OwnerPendingNote variant="banner" className="mt-4">
             {PHOTOS_PENDING_NOTE}
           </OwnerPendingNote>
         </div>
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((f, i) => (
-            <article
-              key={f.title}
-              className={[
-                "overflow-hidden rounded-[1.5rem] border border-[var(--line-subtle)] bg-[var(--card-bg)] shadow-diner",
-                i === features.length - 1 ? "sm:col-span-2 lg:col-span-1" : "",
-              ].join(" ")}
-            >
-              <div className="relative aspect-[16/10] sm:aspect-[5/3]">
-                <Image src={f.img} alt={f.title} fill className="object-cover" sizes="(max-width:768px) 100vw, 33vw" />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[var(--brand-brown)]/55 via-transparent to-transparent" />
-                <p className="absolute bottom-3 left-3 right-14 font-display text-2xl text-[var(--bg-cream)] drop-shadow sm:text-3xl">
-                  {f.title}
-                </p>
-                <span className="absolute bottom-3 right-3 rounded-full bg-[var(--brand-gold)] px-3 py-1 text-xs font-bold text-[var(--brand-brown)] ring-1 ring-black/10">
-                  {f.price}
-                </span>
+
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((f) => (
+            <article key={f.title} className="card-surface-hover flex flex-col">
+              <div className="relative aspect-[4/3] w-full overflow-hidden">
+                <Image
+                  src={f.img}
+                  alt={f.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width:768px) 100vw, 33vw"
+                />
               </div>
-              <p className="p-4 text-sm leading-relaxed text-ink/75 sm:p-5">{f.body}</p>
-              {f.pendingNote && (
-                <p className="mx-4 mb-4 mt-0 rounded-lg bg-[color-mix(in_oklab,var(--brand-gold)_12%,white)] px-3 py-2 text-[11px] font-medium text-[var(--brand-brown)] sm:mx-5">
-                  {f.pendingNote}
-                </p>
-              )}
+              <div className="flex flex-1 flex-col p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="font-display text-xl font-normal text-[var(--brand-brown)]">{f.title}</h3>
+                  <span className="shrink-0 text-sm font-semibold text-teal">{f.price}</span>
+                </div>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-[var(--text-muted)]">{f.body}</p>
+                {f.pendingNote && (
+                  <p className="mt-3 rounded-md bg-[color-mix(in_oklab,var(--brand-gold)_10%,white)] px-3 py-2 text-xs text-[var(--brand-brown)]">
+                    {f.pendingNote}
+                  </p>
+                )}
+              </div>
             </article>
           ))}
         </div>
-        <div className="mt-10 flex justify-center">
-          <Link href="/menu" className="btn-diner-gold min-h-11 px-8">
+
+        <div className="mt-12 text-center">
+          <Link href="/menu" className="btn-primary px-8">
             View full menu
           </Link>
         </div>
@@ -101,35 +100,26 @@ export default function HomePage() {
 
       <section
         id="drive-thru"
-        className="relative scroll-mt-20 overflow-hidden border-y border-[var(--line-subtle)] bg-[var(--brand-brown)] py-12 text-[var(--bg-cream)] sm:py-16"
+        className="scroll-mt-20 border-y border-[var(--line-subtle)] bg-[color-mix(in_oklab,var(--brand-brown)_6%,var(--bg-cream))]"
       >
-        <div className="pointer-events-none absolute inset-0 opacity-30 grain" />
-        <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 md:grid-cols-2 md:gap-10 md:px-6">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 md:py-20">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.32em] text-[var(--brand-gold)]">
-              Drive-thru &amp; pickup
+            <p className="eyebrow">Pickup &amp; drive-thru</p>
+            <h2 className="page-title">Order ahead, pick up when ready</h2>
+            <p className="page-lead !mt-3">
+              Place your order online, then stop by the counter or drive-thru window. We&apos;ll have
+              your food ready — pay in store with cash or card.
             </p>
-            <h3 className="mt-3 font-display text-3xl sm:text-4xl md:text-5xl">Swing by the window</h3>
-            <p className="mt-4 max-w-md text-sm leading-relaxed text-white/80">
-              Grab a cheesesteak, cheese curds, or a frosty root beer float without leaving your car.
-              Friendly service, hometown prices.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3 sm:mt-8">
-              <Link
-                href="/menu"
-                className="inline-flex min-h-11 items-center rounded-full bg-[var(--brand-gold)] px-6 py-3 text-sm font-bold uppercase tracking-wide text-[var(--brand-brown)] shadow-diner ring-1 ring-black/10"
-              >
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/menu" className="btn-primary">
                 Start order
               </Link>
-              <Link
-                href="/contact"
-                className="inline-flex min-h-11 items-center rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white backdrop-blur"
-              >
-                Hours &amp; directions
+              <Link href="/contact" className="btn-secondary">
+                Hours &amp; location
               </Link>
             </div>
           </div>
-          <div className="relative overflow-hidden rounded-[1.75rem] border border-white/10 shadow-diner">
+          <div className="overflow-hidden rounded-xl border border-[var(--line-subtle)] shadow-[var(--shadow-card)]">
             <div className="relative aspect-[4/3]">
               <Image
                 src={MENU_IMAGES.rootbeerFloat}
@@ -138,7 +128,6 @@ export default function HomePage() {
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-[var(--brand-teal)]/45 via-transparent to-[var(--brand-gold)]/25 mix-blend-multiply" />
             </div>
           </div>
         </div>

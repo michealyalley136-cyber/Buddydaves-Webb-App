@@ -14,7 +14,7 @@ export function CategoryPills({
   onChange: (id: string) => void;
 }) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {pills.map((p) => {
         const isOn = p.id === active;
         return (
@@ -23,10 +23,10 @@ export function CategoryPills({
             type="button"
             onClick={() => onChange(p.id)}
             className={clsx(
-              "whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] ring-1 transition",
+              "whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition",
               isOn
-                ? "bg-[var(--brand-brown)] text-[var(--bg-cream)] ring-black/20 shadow-diner"
-                : "bg-white/80 text-ink/75 ring-black/10 hover:bg-white"
+                ? "bg-[var(--brand-teal)] text-white shadow-sm"
+                : "border border-[var(--line-subtle)] bg-white text-[var(--text-muted)] hover:border-teal/30 hover:text-teal"
             )}
           >
             {p.label}

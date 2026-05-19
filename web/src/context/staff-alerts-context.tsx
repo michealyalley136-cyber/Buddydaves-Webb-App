@@ -8,15 +8,22 @@ import {
   useMemo,
   useState,
 } from "react";
-import { unlockStaffAlertAudio, playStaffAlertSound } from "@/lib/staff-alert-audio";
+import {
+  unlockStaffAlertAudio,
+  playStaffAlertSound,
+  playKitchenTestAlert,
+} from "@/lib/staff-alert-audio";
 import {
   requestNotificationPermission,
   showTestNotification,
   vibrateAlert,
 } from "@/lib/staff-alert-notify";
 import {
+  getEffectiveAlertVolume,
   isAudioUnlockedSession,
+  isAlertsMuted,
   loadAlertSettings,
+  muteAlertsForMinutes,
   saveAlertSettings,
   setAudioUnlockedSession,
   wantsSound,
@@ -27,15 +34,14 @@ import {
 const DEFAULT_ALERT_SETTINGS: StaffAlertSettings = {
   enabled: true,
   alertMode: "both",
-  soundId: "buddy-daves-announcement",
-  volume: 1,
+  soundId: "kitchen-buzzer-strong",
+  alertVolume: 1,
   repeatUntilAcknowledged: true,
+  kitchenMode: false,
+  mutedUntilMs: null,
 };
 
-export type TestAlertResult = {
-  ok: boolean;
-  message: string;
-} | null;
+export type TestAlertResult = { ok: boolean; message: string } | null;
 
 type StaffAlertsContextValue = {
   settings: StaffAlertSettings;
@@ -45,6 +51,8 @@ type StaffAlertsContextValue = {
   notificationPermission: NotificationPermission | "unsupported";
   requestDesktopNotifications: () => Promise<boolean>;
   testAlert: () => Promise<TestAlertResult>;
+  testKitchenAlert: () => Promise<TestAlertResult>;
+  muteForFiveMinutes: () => void;
   testResult: TestAlertResult;
   clearTestResult: () => void;
   showTestVisualFlash: boolean;
@@ -59,6 +67,7 @@ export function StaffAlertsProvider({ children }: { children: React.ReactNode })
     useState<NotificationPermission | "unsupported">("default");
   const [testResult, setTestResult] = useState<TestAlertResult>(null);
   const [showTestVisualFlash, setShowTestVisualFlash] = useState(false);
+  const [, setMuteTick] = useState(0);
 
   useEffect(() => {
     setSettings(loadAlertSettings());
@@ -70,41 +79,53 @@ export function StaffAlertsProvider({ children }: { children: React.ReactNode })
     }
   }, []);
 
+  useEffect(() => {
+    if (!settings.mutedUntilMs) return;
+    const id = window.setInterval(() => {
+      setSettings((s) => {
+        if (!s.mutedUntilMs || Date.now() < s.mutedUntilMs) return s;
+        const next = { ...s, mutedUntilMs: null };
+        saveAlertSettings(next);
+        return next;
+      });
+      setMuteTick((t) => t + 1);
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [settings.mutedUntilMs]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.body.classList.toggle("bd-kitchen-mode", settings.kitchenMode);
+    return () => document.body.classList.remove("bd-kitchen-mode");
+  }, [settings.kitchenMode]);
+
   const persistSettings = useCallback((next: StaffAlertSettings) => {
     setSettings(next);
     saveAlertSettings(next);
   }, []);
 
-  const unlockAudio = useCallback(async () => {
-    const parts: string[] = [];
+  const muteForFiveMinutes = useCallback(() => {
+    const next = muteAlertsForMinutes(settings, 5);
+    persistSettings(next);
+    setTestResult({ ok: true, message: "Alerts muted for 5 minutes (visual banner may still show)." });
+  }, [settings, persistSettings]);
 
+  const unlockAudio = useCallback(async () => {
+    const vol = getEffectiveAlertVolume(settings);
     if (wantsSound(settings)) {
-      const result = await unlockStaffAlertAudio(settings.soundId, settings.volume);
+      const result = await unlockStaffAlertAudio(settings.soundId, vol);
       if (result.ok) {
         setAudioUnlockedSession();
         setAudioUnlocked(true);
-        parts.push(result.detail);
-      } else {
-        setTestResult({
-          ok: false,
-          message: `${result.detail} Try pop-up mode if this PC has no speakers.`,
-        });
-        return false;
+        setTestResult({ ok: true, message: result.detail });
+        return true;
       }
-    } else {
-      setAudioUnlockedSession();
-      setAudioUnlocked(true);
-      parts.push("On-screen and pop-up alerts ready (no sound on this mode).");
+      setTestResult({ ok: false, message: result.detail });
+      return false;
     }
-
-    if (wantsPopup(settings) && Notification.permission === "granted") {
-      parts.push("Desktop pop-ups are enabled.");
-    }
-
-    setTestResult({
-      ok: true,
-      message: parts.join(" "),
-    });
+    setAudioUnlockedSession();
+    setAudioUnlocked(true);
+    setTestResult({ ok: true, message: "Visual and pop-up alerts ready." });
     return true;
   }, [settings]);
 
@@ -113,78 +134,100 @@ export function StaffAlertsProvider({ children }: { children: React.ReactNode })
     setNotificationPermission(perm);
     if (perm === "granted") {
       showTestNotification();
-      setTestResult({
-        ok: true,
-        message: "Pop-up enabled — you should see a test notification.",
-      });
+      setTestResult({ ok: true, message: "Pop-up enabled." });
     } else {
-      setTestResult({ ok: false, message: "Pop-up notifications were blocked by the browser." });
+      setTestResult({ ok: false, message: "Pop-up blocked by browser." });
     }
     return perm === "granted";
   }, []);
 
+  const testKitchenAlert = useCallback(async (): Promise<TestAlertResult> => {
+    setShowTestVisualFlash(true);
+    window.setTimeout(() => setShowTestVisualFlash(false), 3000);
+    vibrateAlert([250, 100, 250, 100, 250]);
+
+    if (isAlertsMuted(settings)) {
+      const r = { ok: false, message: "Alerts are muted — unmute or wait for mute to expire." };
+      setTestResult(r);
+      return r;
+    }
+
+    let unlocked = audioUnlocked || isAudioUnlockedSession();
+    if (!unlocked && wantsSound(settings)) {
+      const u = await unlockStaffAlertAudio(settings.soundId, getEffectiveAlertVolume(settings));
+      unlocked = u.ok;
+      if (unlocked) {
+        setAudioUnlockedSession();
+        setAudioUnlocked(true);
+      }
+    }
+
+    if (wantsSound(settings) && !unlocked) {
+      const r = { ok: false, message: 'Click "Enable sound" first.' };
+      setTestResult(r);
+      return r;
+    }
+
+    const played = wantsSound(settings)
+      ? await playKitchenTestAlert(settings)
+      : { ok: true, method: "none" as const, detail: "Visual only." };
+
+    const r = {
+      ok: played.ok,
+      message: played.ok ? `Kitchen test: ${played.detail}` : played.detail,
+    };
+    setTestResult(r);
+    return r;
+  }, [settings, audioUnlocked]);
+
   const testAlert = useCallback(async (): Promise<TestAlertResult> => {
     const parts: string[] = [];
     let ok = true;
-
     setShowTestVisualFlash(true);
     window.setTimeout(() => setShowTestVisualFlash(false), 2500);
     vibrateAlert([120, 60, 120]);
 
-    if (wantsSound(settings)) {
-      if (settings.volume <= 0) {
-        return {
-          ok: false,
-          message: "Volume is at 0% — raise the slider and try again.",
-        };
-      }
+    if (isAlertsMuted(settings)) {
+      return { ok: false, message: "Alerts muted — wait or disable mute." };
+    }
 
+    const vol = getEffectiveAlertVolume(settings);
+
+    if (wantsSound(settings)) {
       let unlocked = audioUnlocked || isAudioUnlockedSession();
       if (!unlocked) {
-        const unlock = await unlockStaffAlertAudio(settings.soundId, settings.volume);
+        const unlock = await unlockStaffAlertAudio(settings.soundId, vol);
         unlocked = unlock.ok;
         if (unlocked) {
           setAudioUnlockedSession();
           setAudioUnlocked(true);
         }
       }
-
       if (!unlocked) {
-        return {
-          ok: false,
-          message: 'Click "Enable order alerts" first, then test again.',
-        };
+        return { ok: false, message: 'Click "Enable sound" first.' };
       }
-
-      const played = await playStaffAlertSound(settings.soundId, settings.volume);
-      if (played.ok) {
-        parts.push(`Sound: ${played.detail}`);
-      } else {
-        ok = false;
-        parts.push(`Sound failed — ${played.detail}`);
-      }
+      const played = await playStaffAlertSound(settings.soundId, vol, {
+        kitchenBoost: settings.kitchenMode,
+      });
+      parts.push(played.ok ? played.detail : `Sound failed: ${played.detail}`);
+      if (!played.ok) ok = false;
     }
 
     if (wantsPopup(settings)) {
       if (Notification.permission !== "granted") {
         ok = false;
-        parts.push("Pop-up not allowed — click Enable desktop notifications.");
+        parts.push("Enable desktop pop-ups.");
       } else {
-        const sent = showTestNotification();
-        parts.push(sent ? "Pop-up test sent." : "Pop-up could not display.");
+        parts.push(showTestNotification() ? "Pop-up sent." : "Pop-up failed.");
       }
     }
 
-    if (settings.alertMode === "visual") {
-      parts.push("On-screen flash shown (banner + tab pulse on real orders).");
-    }
-
     if (parts.length === 0) {
-      parts.push("Enable alerts and choose a mode above.");
+      parts.push("Enable alerts above.");
       ok = false;
     }
 
-    const result: TestAlertResult = { ok, message: parts.join(" ") };
+    const result = { ok, message: parts.join(" ") };
     setTestResult(result);
     return result;
   }, [settings, audioUnlocked]);
@@ -200,6 +243,8 @@ export function StaffAlertsProvider({ children }: { children: React.ReactNode })
       notificationPermission,
       requestDesktopNotifications,
       testAlert,
+      testKitchenAlert,
+      muteForFiveMinutes,
       testResult,
       clearTestResult,
       showTestVisualFlash,
@@ -212,6 +257,8 @@ export function StaffAlertsProvider({ children }: { children: React.ReactNode })
       notificationPermission,
       requestDesktopNotifications,
       testAlert,
+      testKitchenAlert,
+      muteForFiveMinutes,
       testResult,
       clearTestResult,
       showTestVisualFlash,

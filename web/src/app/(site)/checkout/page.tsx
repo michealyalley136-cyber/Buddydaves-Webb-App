@@ -25,19 +25,14 @@ function OrderTypeOption({
       type="button"
       onClick={onSelect}
       className={clsx(
-        "relative rounded-2xl border-2 px-4 py-4 text-left transition",
+        "rounded-xl border-2 px-4 py-4 text-left transition",
         selected
-          ? "border-[var(--brand-teal)] bg-[color-mix(in_oklab,var(--brand-teal)_12%,white)] shadow-md ring-2 ring-teal/25"
-          : "border-[var(--line-subtle)] bg-white/70 hover:border-teal/30 hover:bg-white"
+          ? "border-[var(--brand-teal)] bg-[color-mix(in_oklab,var(--brand-teal)_8%,white)]"
+          : "border-[var(--line-subtle)] bg-white hover:border-teal/25"
       )}
     >
-      {selected && (
-        <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-[var(--brand-teal)] text-xs font-bold text-white">
-          ✓
-        </span>
-      )}
-      <p className="font-display text-2xl text-[var(--brand-brown)]">{title}</p>
-      <p className="mt-1 text-sm text-ink/65">{subtitle}</p>
+      <p className="font-semibold text-[var(--brand-brown)]">{title}</p>
+      <p className="mt-1 text-sm text-[var(--text-muted)]">{subtitle}</p>
     </button>
   );
 }
@@ -57,9 +52,9 @@ export default function CheckoutPage() {
     return (
       <div className="layout-page-narrow">
         <EmptyState
-          title="Nothing to checkout yet"
-          body="Add a few favorites from the menu — we'll have the kitchen ready."
-          cta={{ href: "/menu", label: "Back to Menu" }}
+          title="Nothing to checkout"
+          body="Add items from the menu to place an order."
+          cta={{ href: "/menu", label: "View menu" }}
         />
       </div>
     );
@@ -68,7 +63,7 @@ export default function CheckoutPage() {
   async function submit() {
     setError(null);
     if (!name.trim() || !phone.trim()) {
-      setError("Please add your name and phone so we can reach you.");
+      setError("Please enter your name and phone number.");
       return;
     }
     setBusy(true);
@@ -104,111 +99,100 @@ export default function CheckoutPage() {
   return (
     <div className="layout-page-narrow">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs font-bold uppercase tracking-[0.28em] text-teal">Checkout</p>
-        <Link href="/menu" className="text-sm font-bold uppercase tracking-wide text-teal hover:underline">
+        <div>
+          <p className="eyebrow">Checkout</p>
+          <h1 className="page-title !mt-1">Complete your order</h1>
+        </div>
+        <Link href="/menu" className="text-sm font-medium text-teal hover:underline">
           Back to menu
         </Link>
       </div>
-      <h1 className="mt-2 font-display text-4xl text-[var(--brand-brown)] sm:text-5xl">Almost there</h1>
 
-      <div className="mt-6 rounded-2xl border-2 border-[var(--brand-gold)] bg-[color-mix(in_oklab,var(--brand-gold)_20%,white)] px-5 py-4 text-center shadow-sm ring-1 ring-[var(--brand-gold)]/40">
-        <p className="text-xs font-bold uppercase tracking-[0.22em] text-[var(--brand-brown)]">
-          Pay in store only
-        </p>
-        <p className="mt-2 text-sm font-semibold leading-relaxed text-ink/85">
-          Cash or card at pickup or the drive-thru window — we&apos;ll total your order when you arrive.
+      <div className="mt-6 rounded-xl border border-[var(--brand-gold)]/40 bg-[color-mix(in_oklab,var(--brand-gold)_12%,white)] px-5 py-4">
+        <p className="text-sm font-semibold text-[var(--brand-brown)]">Pay in store only</p>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          Cash or card at pickup or the drive-thru window. Your total is confirmed when you arrive.
         </p>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-[var(--line-subtle)] bg-white/80 p-4 sm:p-5">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal">Your order</p>
+      <div className="mt-6 rounded-xl border border-[var(--line-subtle)] bg-white p-5">
+        <p className="text-xs font-semibold uppercase tracking-wider text-teal">Order summary</p>
         <ul className="mt-3 divide-y divide-[var(--line-subtle)]">
           {lines.map((l) => (
             <li key={l.menuItemId} className="flex items-center justify-between gap-3 py-2.5 text-sm">
-              <span className="text-ink/80">
-                <span className="font-bold text-[var(--brand-brown)]">{l.quantity}×</span> {l.name}
+              <span className="text-[var(--text-muted)]">
+                <span className="font-semibold text-[var(--brand-brown)]">{l.quantity}×</span> {l.name}
               </span>
-              <span className="shrink-0 font-semibold">${(l.price * l.quantity).toFixed(2)}</span>
+              <span className="shrink-0 font-medium">${(l.price * l.quantity).toFixed(2)}</span>
             </li>
           ))}
         </ul>
         <div className="mt-3 flex items-center justify-between border-t border-[var(--line-subtle)] pt-3">
-          <span className="text-sm font-semibold text-ink/70">Subtotal due at pickup</span>
-          <span className="font-display text-2xl text-[var(--brand-brown)]">${subtotal.toFixed(2)}</span>
+          <span className="text-sm font-medium text-[var(--text-muted)]">Subtotal</span>
+          <span className="text-lg font-semibold text-[var(--brand-brown)]">${subtotal.toFixed(2)}</span>
         </div>
       </div>
 
-      <div className="mt-6 rounded-3xl border border-[var(--line-subtle)] bg-[var(--card-bg)] p-5 shadow-lift sm:p-6">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal">Step 1 · How are you picking up?</p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <OrderTypeOption
-            selected={orderType === "pickup"}
-            title="Pickup"
-            subtitle="Counter or curbside — we'll call your name."
-            onSelect={() => setOrderType("pickup")}
-          />
-          <OrderTypeOption
-            selected={orderType === "drive_thru"}
-            title="Drive-Thru"
-            subtitle="Stay in your car — we'll hand it through the window."
-            onSelect={() => setOrderType("drive_thru")}
-          />
+      <div className="mt-6 space-y-8 rounded-xl border border-[var(--line-subtle)] bg-white p-5 sm:p-6">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-teal">Pickup method</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <OrderTypeOption
+              selected={orderType === "pickup"}
+              title="Pickup"
+              subtitle="Counter or curbside"
+              onSelect={() => setOrderType("pickup")}
+            />
+            <OrderTypeOption
+              selected={orderType === "drive_thru"}
+              title="Drive-thru"
+              subtitle="Stay in your vehicle"
+              onSelect={() => setOrderType("drive_thru")}
+            />
+          </div>
         </div>
 
-        <p className="mt-8 text-xs font-bold uppercase tracking-[0.2em] text-teal">Step 2 · Your details</p>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <label className="block text-sm font-semibold text-ink/80">
-            Name
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-teal">Contact details</p>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <label className="block text-sm font-medium text-[var(--brand-brown)]">
+              Name
+              <input className="input-field" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
+            </label>
+            <label className="block text-sm font-medium text-[var(--brand-brown)]">
+              Phone
+              <input className="input-field" value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" />
+            </label>
+          </div>
+          <label className="mt-4 block text-sm font-medium text-[var(--brand-brown)]">
+            Preferred pickup time <span className="font-normal text-[var(--text-muted)]">(optional)</span>
             <input
-              className="mt-2 w-full rounded-xl border border-[var(--line-subtle)] bg-white px-3 py-3 text-sm outline-none ring-teal/30 focus:ring-2"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              autoComplete="name"
+              className="input-field"
+              placeholder="e.g. 5:45 PM"
+              value={pickupTime}
+              onChange={(e) => setPickupTime(e.target.value)}
             />
           </label>
-          <label className="block text-sm font-semibold text-ink/80">
-            Phone
-            <input
-              className="mt-2 w-full rounded-xl border border-[var(--line-subtle)] bg-white px-3 py-3 text-sm outline-none ring-teal/30 focus:ring-2"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              autoComplete="tel"
+          <label className="mt-4 block text-sm font-medium text-[var(--brand-brown)]">
+            Order notes <span className="font-normal text-[var(--text-muted)]">(optional)</span>
+            <textarea
+              className="input-field min-h-[96px]"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
             />
           </label>
         </div>
-        <label className="mt-4 block text-sm font-semibold text-ink/80">
-          Pickup time <span className="font-normal text-ink/50">(optional)</span>
-          <input
-            className="mt-2 w-full rounded-xl border border-[var(--line-subtle)] bg-white px-3 py-3 text-sm outline-none ring-teal/30 focus:ring-2"
-            placeholder="e.g. 5:45 PM"
-            value={pickupTime}
-            onChange={(e) => setPickupTime(e.target.value)}
-          />
-        </label>
-        <label className="mt-4 block text-sm font-semibold text-ink/80">
-          Notes <span className="font-normal text-ink/50">(optional)</span>
-          <textarea
-            className="mt-2 min-h-[96px] w-full rounded-xl border border-[var(--line-subtle)] bg-white px-3 py-3 text-sm outline-none ring-teal/30 focus:ring-2"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-          />
-        </label>
 
         {error && (
-          <p className="mt-4 rounded-xl bg-[color-mix(in_oklab,var(--accent-red)_12%,white)] px-3 py-2 text-sm text-[var(--accent-red)]">
+          <p className="rounded-lg bg-[color-mix(in_oklab,var(--accent-red)_10%,white)] px-3 py-2 text-sm text-[var(--accent-red)]">
             {error}
           </p>
         )}
 
-        <button
-          type="button"
-          disabled={busy}
-          onClick={submit}
-          className="mt-8 w-full rounded-full bg-[var(--brand-teal)] py-4 text-sm font-bold uppercase tracking-wide text-white shadow-lift ring-1 ring-black/10 disabled:opacity-60"
-        >
+        <button type="button" disabled={busy} onClick={submit} className="btn-primary w-full disabled:opacity-60">
           {busy ? "Placing order…" : "Place order"}
         </button>
-        <Link href="/cart" className="mt-3 block text-center text-sm font-semibold text-teal hover:underline">
+        <Link href="/cart" className="block text-center text-sm font-medium text-teal hover:underline">
           Back to cart
         </Link>
       </div>

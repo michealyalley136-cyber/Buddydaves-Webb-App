@@ -1,0 +1,218 @@
+Buddy Dave's — All URLs (local development)
+============================================
+Base website:  http://localhost:3000
+Base API:      http://localhost:4000
+
+Run locally:     npm run dev              (from project root — starts web + API)
+Clean restart:   npm run dev:clean        (fixes blank pages / 500 errors)
+Build web only:  npm run build:web        (stop dev first — do not build while dev is running)
+Full build:      npm run build            (server + web — stop dev first)
+
+Troubleshooting:
+  - Blank screen or 500 (e.g. /menu): run npm run dev:clean, open a NEW tab, Ctrl+Shift+R
+  - Browser uses http://localhost:3000 from the terminal (not an old bookmark)
+  - Do not run npm run build while npm run dev is running (corrupts web/.next)
+
+
+================================================================================
+CUSTOMER WEBSITE (public)
+================================================================================
+
+Homepage
+  http://localhost:3000/
+
+Menu
+  http://localhost:3000/menu
+
+Cart
+  http://localhost:3000/cart
+
+Checkout
+  http://localhost:3000/checkout
+
+Order confirmation (after placing order)
+  http://localhost:3000/order/confirmation
+  http://localhost:3000/order/confirmation?code=BD-XXXXXXXX-XXXX
+
+Track order
+  http://localhost:3000/track-order
+  http://localhost:3000/track-order?code=BD-XXXXXXXX-XXXX
+
+Our story
+  http://localhost:3000/our-story
+
+Contact
+  http://localhost:3000/contact
+
+Owner training guide (in-app only — not downloadable)
+  http://localhost:3000/owner-guide
+
+Homepage anchor (pickup & drive-thru section)
+  http://localhost:3000/#drive-thru
+
+First-visit welcome audio (plays once per browser)
+  http://localhost:3000/media/buddy-daves-welcome-loop.mp3
+
+
+================================================================================
+STAFF & KITCHEN
+================================================================================
+
+Staff login (staff + admin both use this page)
+  http://localhost:3000/staff/login
+
+Staff root (redirects to login)
+  http://localhost:3000/staff
+
+Staff dashboard — active orders
+  http://localhost:3000/staff/dashboard
+
+Staff dashboard — completed orders
+  http://localhost:3000/staff/dashboard?view=completed
+
+Staff dashboard — alert settings (kitchen mode, sounds, mute)
+  http://localhost:3000/staff/dashboard?view=settings
+
+Staff dashboard — daily audit (placeholder)
+  http://localhost:3000/staff/dashboard?view=audit
+
+
+================================================================================
+ADMIN PANEL (sign in as admin@buddyda.local)
+================================================================================
+
+Admin dashboard
+  http://localhost:3000/admin
+
+Admin menu management
+  http://localhost:3000/admin/menu
+
+Admin categories
+  http://localhost:3000/admin/categories
+
+Admin orders
+  http://localhost:3000/admin/orders
+
+Admin reports (placeholder)
+  http://localhost:3000/admin/reports
+
+Admin settings (placeholder)
+  http://localhost:3000/admin/settings
+
+
+================================================================================
+OWNER / TRAINING (legacy bookmarks)
+================================================================================
+
+Old printable HTML guide (redirects to in-app owner guide)
+  http://localhost:3000/training/buddy-daves-owner-training-guide.html
+  → redirects to http://localhost:3000/owner-guide
+
+Note: Downloadable PDF and /training/vendor/ files were removed. Training lives in the app at /owner-guide only.
+
+
+================================================================================
+API — EXPRESS (port 4000)
+================================================================================
+
+Health
+  http://localhost:4000/api/health
+
+Database health
+  http://localhost:4000/api/health/db
+
+Auth — staff/admin login (POST)
+  http://localhost:4000/api/auth/login
+
+Public menu (GET)
+  http://localhost:4000/api/menu
+
+Create customer order (POST)
+  http://localhost:4000/api/orders
+
+Track order by code (GET)
+  http://localhost:4000/api/orders/{code}
+  Example: http://localhost:4000/api/orders/BD-20260516-1234
+
+Staff — list orders (GET, requires login token)
+  http://localhost:4000/api/staff/orders
+  http://localhost:4000/api/staff/orders?view=completed
+
+Staff — update order status (PATCH, requires login token)
+  http://localhost:4000/api/staff/orders/{orderId}/status
+
+Staff — demo incoming order for kitchen trial (POST, requires login token)
+  http://localhost:4000/api/staff/demo-order
+
+Admin — categories (GET, admin token)
+  http://localhost:4000/api/admin/categories
+
+Admin — menu items (GET / POST, admin token)
+  http://localhost:4000/api/admin/menu-items
+  http://localhost:4000/api/admin/menu-items/{id}     (PATCH / DELETE)
+
+Admin — recent orders (GET, admin token)
+  http://localhost:4000/api/admin/recent-orders
+
+Admin — order summary counts (GET, admin token)
+  http://localhost:4000/api/admin/orders/summary
+
+
+================================================================================
+API — via website proxy (browser uses these from the Next app)
+================================================================================
+When using the website in the browser, the app calls same-origin URLs like:
+  http://localhost:3000/api/menu
+  http://localhost:3000/api/orders
+  http://localhost:3000/api/auth/login
+  etc.
+(Next.js forwards /api/* to http://localhost:4000)
+
+
+================================================================================
+STATIC ASSETS (examples)
+================================================================================
+
+Logo (official — place file at web/public/images/buddy-daves-logo.png)
+  http://localhost:3000/images/buddy-daves-logo.png
+
+PWA icon (SVG fallback)
+  http://localhost:3000/icons/icon.svg
+
+Staff alert sounds
+  http://localhost:3000/sounds/buddy-daves-announcement.m4a
+  http://localhost:3000/sounds/kitchen-buzzer-strong.wav
+  http://localhost:3000/sounds/classic-bell.wav
+  http://localhost:3000/sounds/diner-ding.wav
+  http://localhost:3000/sounds/kitchen-buzzer.wav
+  http://localhost:3000/sounds/double-beep.wav
+  http://localhost:3000/sounds/long-alert.wav
+
+PWA manifest
+  http://localhost:3000/manifest.webmanifest
+
+Service worker (PWA)
+  http://localhost:3000/sw.js
+
+
+================================================================================
+PRODUCTION (replace localhost when you deploy)
+================================================================================
+  Website:  https://YOUR-DOMAIN.com
+  API:      https://YOUR-API-DOMAIN.com   (or same domain with /api proxy)
+  Set NEXT_PUBLIC_API_URL on the web host if the API is on a separate origin.
+
+  Customer:     https://YOUR-DOMAIN.com/menu
+  Owner guide:  https://YOUR-DOMAIN.com/owner-guide
+  Staff login:  https://YOUR-DOMAIN.com/staff/login
+  Admin:        https://YOUR-DOMAIN.com/admin
+
+See README.md for deploy notes.
+
+
+================================================================================
+RELATED FILES
+================================================================================
+  Logins:     Buddy-Daves-Logins.txt   (local only — gitignored)
+  URLs:       Buddy-Daves-URLs.txt     (this file)
+  README:     README.md

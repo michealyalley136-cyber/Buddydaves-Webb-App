@@ -60,6 +60,12 @@ const presets = {
     { freq: 220, duration: 0.15, gain: 0.5, gap: 0.04 },
     { freq: 220, duration: 0.15, gain: 0.5 },
   ],
+  "kitchen-buzzer-strong": [
+    { freq: 220, duration: 0.18, gain: 0.55 },
+    { freq: 220, duration: 0.18, gain: 0.55, gap: 0.05 },
+    { freq: 330, duration: 0.22, gain: 0.5 },
+    { freq: 220, duration: 0.2, gain: 0.55 },
+  ],
   "double-beep": [
     { freq: 980, duration: 0.1, gain: 0.42 },
     { freq: 980, duration: 0.1, gain: 0.42, gap: 0.12 },

@@ -2,6 +2,7 @@
 
 import { CartProvider } from "@/context/cart-context";
 import { StaffAuthProvider } from "@/context/staff-auth-context";
+import { ChunkErrorRecovery } from "@/components/chunk-error-recovery";
 import { useEffect } from "react";
 
 const LEGACY_CACHE_PREFIX = "buddy-daves";
@@ -31,6 +32,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
     <StaffAuthProvider>
       <CartProvider>
+        <ChunkErrorRecovery />
         <ClearLegacyPwaCaches />
         {children}
       </CartProvider>

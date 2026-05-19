@@ -9,28 +9,20 @@ export function MenuCartBar() {
 
   if (count === 0) return null;
 
-  const checkoutHref = count > 0 ? "/checkout" : "/cart";
-
   return (
-    <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--line-subtle)] bg-[var(--card-bg)]/95 px-4 py-3 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] backdrop-blur">
+    <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--line-subtle)] bg-white/95 px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] backdrop-blur-sm">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-wide text-ink/55">
-            {count} item{count === 1 ? "" : "s"} in cart
+          <p className="text-xs font-medium text-[var(--text-muted)]">
+            {count} item{count === 1 ? "" : "s"}
           </p>
-          <p className="font-display text-2xl text-[var(--brand-brown)]">${subtotal.toFixed(2)}</p>
+          <p className="text-lg font-semibold text-[var(--brand-brown)]">${subtotal.toFixed(2)}</p>
         </div>
-        <div className="flex flex-1 gap-2 sm:flex-none">
-          <Link
-            href="/cart"
-            className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full border border-[var(--line-subtle)] bg-white px-4 py-3 text-sm font-bold uppercase tracking-wide text-teal sm:flex-none"
-          >
-            View cart
+        <div className="flex gap-2">
+          <Link href="/cart" className="btn-secondary min-h-11 px-4">
+            Cart
           </Link>
-          <Link
-            href={checkoutHref}
-            className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full bg-[var(--brand-gold)] px-6 py-3 text-sm font-bold uppercase tracking-wide text-[var(--brand-brown)] shadow-diner ring-1 ring-black/10 sm:flex-none"
-          >
+          <Link href="/checkout" className="btn-gold min-h-11 px-6">
             Checkout
           </Link>
         </div>

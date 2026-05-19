@@ -23,12 +23,10 @@ module.exports = {
         body: ["var(--font-body)", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        diner: "0 18px 50px rgba(44, 36, 28, 0.18)",
-        lift: "0 12px 28px rgba(18, 52, 58, 0.12)",
-      },
-      backgroundImage: {
-        "noise-soft":
-          "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E\")",
+        card: "var(--shadow-card)",
+        "card-hover": "var(--shadow-card-hover)",
+        diner: "var(--shadow-card)",
+        lift: "var(--shadow-card-hover)",
       },
     },
   },

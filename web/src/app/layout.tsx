@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Bebas_Neue, DM_Sans } from "next/font/google";
+import { DM_Sans, Libre_Baskerville } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "@/components/app-providers";
 
-const display = Bebas_Neue({
-  weight: "400",
+const display = Libre_Baskerville({
+  weight: ["400", "700"],
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",

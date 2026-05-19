@@ -7,7 +7,19 @@ const monorepoRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "..
 
 const nextConfig: NextConfig = {
   outputFileTracingRoot: monorepoRoot,
-  /** Proxy API in dev so the browser can use same-origin `/api/*` (avoids CORS / wrong port). */
+  async redirects() {
+    return [
+      {
+        source: "/training/buddy-daves-owner-training-guide.html",
+        destination: "/owner-guide",
+        permanent: true,
+      },
+    ];
+  },
+  /**
+   * Proxy `/api/*` to Express. Local default: localhost:4000.
+   * Railway: set API_PROXY_TARGET to your server service URL before `npm run build`.
+   */
   async rewrites() {
     const api = process.env.API_PROXY_TARGET ?? "http://localhost:4000";
     return [{ source: "/api/:path*", destination: `${api}/api/:path*` }];

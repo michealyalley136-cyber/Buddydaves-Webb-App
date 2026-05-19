@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import clsx from "clsx";
 import { Suspense, useEffect, useState } from "react";
 import { useStaffAuth } from "@/context/staff-auth-context";
-import { StaffAlertsProvider } from "@/context/staff-alerts-context";
+import { StaffAlertsProvider, useStaffAlerts } from "@/context/staff-alerts-context";
 import { LogoMark } from "@/components/logo-mark";
 
 const links = [
@@ -85,7 +85,7 @@ function StaffShellGate({ children }: { children: React.ReactNode }) {
           </div>
         }
       >
-        <StaffShellLayout user={user} logout={logout}>
+        <StaffShellLayout user={user!} logout={logout}>
           {children}
         </StaffShellLayout>
       </Suspense>
@@ -103,6 +103,7 @@ function StaffShellLayout({
   logout: () => void;
 }) {
   const searchParams = useSearchParams();
+  const { settings, persistSettings } = useStaffAlerts();
   const view = searchParams.get("view");
   const tab =
     view === "completed"
@@ -113,10 +114,17 @@ function StaffShellLayout({
           ? "settings"
           : "orders";
 
+  const kitchenOn = settings.kitchenMode && tab === "orders";
+
   return (
     <div className="min-h-screen bg-[#121518] text-white">
       <header className="sticky top-0 z-20 border-b border-white/10 bg-[var(--brand-teal)]">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 md:px-6">
+        <div
+          className={clsx(
+            "mx-auto flex items-center justify-between gap-4 px-4 py-3",
+            kitchenOn ? "max-w-[1600px]" : "max-w-6xl md:px-6"
+          )}
+        >
           <div className="flex items-center gap-3">
             <LogoMark size="sm" linked={false} fallbackClassName="text-[var(--bg-cream)]" />
             <div>
@@ -124,7 +132,21 @@ function StaffShellLayout({
               <p className="font-display text-2xl tracking-wide">Line dashboard</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-4">
+            {tab === "orders" && (
+              <button
+                type="button"
+                onClick={() => persistSettings({ ...settings, kitchenMode: !settings.kitchenMode })}
+                className={clsx(
+                  "min-h-[40px] rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide ring-1 touch-manipulation sm:text-xs",
+                  settings.kitchenMode
+                    ? "bg-[var(--brand-gold)] text-[var(--brand-brown)] ring-black/20"
+                    : "bg-white/10 text-white ring-white/20"
+                )}
+              >
+                Kitchen mode {settings.kitchenMode ? "ON" : "OFF"}
+              </button>
+            )}
             {user.role === "admin" && (
               <Link
                 href="/admin"
@@ -142,8 +164,18 @@ function StaffShellLayout({
           </div>
         </div>
       </header>
-      <div className="mx-auto flex max-w-6xl gap-6 px-4 py-6 md:px-6">
-        <aside className="hidden w-56 shrink-0 self-start rounded-2xl border border-white/10 bg-[#1b1f24] p-3 md:block">
+      <div
+        className={clsx(
+          "mx-auto flex gap-6 px-4 py-6",
+          kitchenOn ? "max-w-[1600px]" : "max-w-6xl md:px-6"
+        )}
+      >
+        <aside
+          className={clsx(
+            "hidden w-56 shrink-0 self-start rounded-2xl border border-white/10 bg-[#1b1f24] p-3 md:block",
+            kitchenOn && "lg:hidden"
+          )}
+        >
           <nav className="space-y-1">
             {links.map((l) => (
               <Link

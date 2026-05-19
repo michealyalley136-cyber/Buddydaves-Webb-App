@@ -12,7 +12,7 @@ const dimensions: Record<LogoSize, { box: string; px: number }> = {
   sm: { box: "h-11 w-11", px: 44 },
   nav: { box: "h-12 w-12 sm:h-14 sm:w-14", px: 56 },
   footer: { box: "h-20 w-20 sm:h-24 sm:w-24", px: 96 },
-  hero: { box: "h-28 w-28 sm:h-36 sm:w-36", px: 144 },
+  hero: { box: "h-16 w-16 sm:h-20 sm:w-20", px: 80 },
 };
 
 function LogoTextFallback({

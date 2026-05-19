@@ -1,9 +1,12 @@
 function resolveApiBase() {
-  const configured = process.env.NEXT_PUBLIC_API_URL?.trim();
+  const configured =
+    process.env.NEXT_PUBLIC_API_URL?.trim() ||
+    process.env.API_URL?.trim() ||
+    (typeof window === "undefined" ? process.env.API_PROXY_TARGET?.trim() : "");
   if (configured) return configured.replace(/\/$/, "");
   // Browser: same-origin `/api/*` (proxied to Express in next.config rewrites)
   if (typeof window !== "undefined") return "";
-  return (process.env.API_URL ?? "http://localhost:4000").replace(/\/$/, "");
+  return "http://localhost:4000";
 }
 
 export const API_BASE = resolveApiBase();

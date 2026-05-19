@@ -12,3 +12,9 @@ Buddy-Daves-Logins.txt
 coverage
 .turbo
 .vercel
+
+# Database dumps / backups
+*.sql
+*.dump
+**/dumps/
+**/database-dumps/
