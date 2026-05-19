@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { DM_Sans, Libre_Baskerville } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "@/components/app-providers";
+import { EasyInstallAssistant } from "@/components/EasyInstallAssistant";
 
 const display = Libre_Baskerville({
   weight: ["400", "700"],
@@ -31,6 +32,10 @@ export const metadata: Metadata = {
     title: "Buddy Dave's",
   },
   formatDetection: { telephone: false },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+  },
   icons: {
     icon: "/images/buddy-daves-logo.png",
     apple: "/images/buddy-daves-logo.png",
@@ -60,7 +65,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             Buddy Dave&apos;s needs JavaScript enabled. Please enable it to order online.
           </div>
         </noscript>
-        <AppProviders>{children}</AppProviders>
+        <AppProviders>
+          {children}
+          <EasyInstallAssistant />
+        </AppProviders>
       </body>
     </html>
   );

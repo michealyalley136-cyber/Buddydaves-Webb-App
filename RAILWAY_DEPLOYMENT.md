@@ -54,13 +54,20 @@ Deploy **server first** (database + API), then **web** (needs the server public 
 
 ### Server environment variables
 
-| Variable       | Value |
+```env
+NODE_ENV=production
+DATABASE_URL=${{Postgres.DATABASE_URL}}
+JWT_SECRET=<existing production secret>
+CORS_ORIGIN=https://web-production-3bbed.up.railway.app
+```
+
+| Variable       | Notes |
 | -------------- | ----- |
 | `NODE_ENV`     | `production` |
-| `DATABASE_URL` | Paste from Railway PostgreSQL (`${{Postgres.DATABASE_URL}}` reference) |
-| `JWT_SECRET`   | Generate a **new** long random string (64+ chars). Never use the dev default. |
-| `CORS_ORIGIN`  | Your **web** service public URL, e.g. `https://web-production-3bbed.up.railway.app` (no trailing slash). Comma-separate multiple origins if needed. |
-| `PORT`         | Railway sets this automatically; optional `4000` for local parity. |
+| `DATABASE_URL` | Railway PostgreSQL reference — no trailing slash |
+| `JWT_SECRET`   | Long random string (64+ chars). Never use the dev default. |
+| `CORS_ORIGIN`  | **Web** URL only: `https://web-production-3bbed.up.railway.app` (no trailing slash) |
+| `PORT`         | Railway sets automatically |
 
 `CORS_ORIGIN` is **required** in production. The API does **not** use open wildcard CORS in production.
 
@@ -122,6 +129,15 @@ https://YOUR-SERVER-SERVICE.up.railway.app/api/health/db
 
 Set these on the **web** service (build **and** runtime — the App Router proxy reads env at request time).
 
+```env
+API_PROXY_TARGET=https://server-production-e915.up.railway.app
+API_URL=https://server-production-e915.up.railway.app
+NEXT_PUBLIC_API_URL=
+NEXT_PUBLIC_FORCE_DIRECT_API=false
+```
+
+**Important:** No trailing slash on URLs.
+
 | Variable | Value |
 | -------- | ----- |
 | `API_PROXY_TARGET` | `https://server-production-e915.up.railway.app` |
@@ -143,17 +159,23 @@ How routing works:
 ## 4. Post-deployment test checklist
 
 1. **API health (server)** — `https://server-production-e915.up.railway.app/api/health`
-2. **Menu JSON (server)** — `https://server-production-e915.up.railway.app/api/menu`
-3. **Menu JSON (web proxy)** — `https://web-production-3bbed.up.railway.app/api/menu`
-4. **Homepage** — `https://web-production-3bbed.up.railway.app/`
-5. **Menu page** — open `/menu` on phone and desktop; items should load
-6. **Menu cart** — add an item to cart
-7. **Checkout** — submit pickup or drive-thru order
-8. **Staff** — `https://web-production-3bbed.up.railway.app/staff/login`
-9. Confirm **new order** appears on dashboard
-10. Confirm **sound / visual alert** (allow browser notifications/audio if prompted)
-11. Move order: **Pending → Preparing → Ready → Completed**
-12. Confirm **no secrets** in page source (no `JWT_SECRET`, no staff passwords in client bundles)
+2. **DB health (server)** — `https://server-production-e915.up.railway.app/api/health/db`
+3. **Menu debug (server)** — `https://server-production-e915.up.railway.app/api/menu/debug`
+4. **Menu JSON (server)** — `https://server-production-e915.up.railway.app/api/menu`
+5. **API health (web proxy)** — `https://web-production-3bbed.up.railway.app/api/health`
+6. **Menu debug (web proxy)** — `https://web-production-3bbed.up.railway.app/api/menu/debug`
+7. **Menu JSON (web proxy)** — `https://web-production-3bbed.up.railway.app/api/menu`
+8. **Homepage** — `https://web-production-3bbed.up.railway.app/`
+9. **Menu page** — `/menu` loads on phone and desktop
+10. **Install assistant** — banner on customer pages; iPhone shows step guide; Android uses install prompt when available
+11. **Install help** — `https://web-production-3bbed.up.railway.app/install`
+12. **Menu cart** — add an item to cart
+13. **Checkout** — submit pickup or drive-thru order
+14. **Staff** — `https://web-production-3bbed.up.railway.app/staff/login` (no install banner)
+15. Confirm **new order** appears on dashboard
+16. Confirm **sound / visual alert** (allow browser notifications/audio if prompted)
+17. Move order: **Pending → Preparing → Ready → Completed**
+18. Confirm **no secrets** in page source
 
 ### After pushing code — Railway order
 

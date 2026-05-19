@@ -62,7 +62,10 @@ async function proxy(req: NextRequest, context: RouteContext): Promise<NextRespo
   } catch (e) {
     const message = e instanceof Error ? e.message : "Upstream request failed";
     console.error("[web/api-proxy] Fetch failed:", message);
-    return NextResponse.json({ error: "API unavailable" }, { status: 502 });
+    return NextResponse.json(
+      { error: "API proxy failed", detail: message },
+      { status: 502 }
+    );
   }
 
   const responseHeaders = new Headers();

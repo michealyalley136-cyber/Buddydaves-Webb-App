@@ -32,7 +32,10 @@ export default function MenuPage() {
             .filter((c) => c.items.length > 0)
         )
       )
-      .catch(() => setErr("We couldn't load the menu. Check your connection and try again."));
+      .catch((e) => {
+        console.error("[menu] Failed to load menu:", e);
+        setErr("We couldn't load the menu. Check your connection and try again.");
+      });
   }, []);
 
   const pills = useMemo(() => {
