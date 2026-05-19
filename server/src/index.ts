@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import { runBootstrap } from "./bootstrap.js";
 import { healthRouter } from "./routes/health.js";
 import { menuRouter } from "./routes/menu.js";
 import { ordersRouter } from "./routes/orders.js";
@@ -48,16 +49,41 @@ app.use((_req, res) => {
   res.status(404).json({ error: "Not found" });
 });
 
-const server = app.listen(port, host, () => {
-  console.log(`Buddy Dave's API listening on ${host}:${port}`);
-});
-
-server.on("error", (err: NodeJS.ErrnoException) => {
-  if (err.code === "EADDRINUSE") {
-    console.error(
-      `Port ${port} is already in use. Stop the other process or run "npm run dev:clean" from the repo root.`
-    );
-    process.exit(1);
+app.use(
+  (
+    err: unknown,
+    _req: express.Request,
+    res: express.Response,
+    _next: express.NextFunction
+  ) => {
+    console.error("[api]", err);
+    if (res.headersSent) return;
+    res.status(500).json({ error: "Internal server error" });
   }
-  throw err;
+);
+
+async function main() {
+  await runBootstrap();
+  const server = app.listen(port, host, () => {
+    console.log(`Buddy Dave's API listening on ${host}:${port}`);
+    if (process.env.NODE_ENV === "production") {
+      const cors = process.env.CORS_ORIGIN?.trim() || "(not set)";
+      console.log(`[startup] CORS_ORIGIN: ${cors}`);
+    }
+  });
+
+  server.on("error", (err: NodeJS.ErrnoException) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(
+        `Port ${port} is already in use. Stop the other process or run "npm run dev:clean" from the repo root.`
+      );
+      process.exit(1);
+    }
+    throw err;
+  });
+}
+
+void main().catch((e) => {
+  console.error(e);
+  process.exit(1);
 });

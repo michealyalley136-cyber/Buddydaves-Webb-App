@@ -1,14 +1,27 @@
-function resolveApiBase() {
+function resolveApiBase(): string {
+  if (typeof window !== "undefined") {
+    const forceDirect = process.env.NEXT_PUBLIC_FORCE_DIRECT_API === "true";
+    if (forceDirect) {
+      const direct = process.env.NEXT_PUBLIC_API_URL?.trim();
+      if (direct) return direct.replace(/\/$/, "");
+    }
+    return "";
+  }
+
   const configured =
-    process.env.NEXT_PUBLIC_API_URL?.trim() ||
+    process.env.API_PROXY_TARGET?.trim() ||
     process.env.API_URL?.trim() ||
-    (typeof window === "undefined" ? process.env.API_PROXY_TARGET?.trim() : "");
+    process.env.NEXT_PUBLIC_API_URL?.trim();
   if (configured) return configured.replace(/\/$/, "");
-  // Browser: same-origin `/api/*` (proxied to Express in next.config rewrites)
-  if (typeof window !== "undefined") return "";
-  return "http://localhost:4000";
+  if (process.env.NODE_ENV === "development") return "http://localhost:4000";
+  return "";
 }
 
+export function getApiBase(): string {
+  return resolveApiBase();
+}
+
+/** @deprecated Prefer getApiBase() for runtime resolution */
 export const API_BASE = resolveApiBase();
 
 export class ApiError extends Error {
@@ -32,7 +45,7 @@ async function parseError(res: Response) {
 }
 
 export async function apiGet<T>(path: string, token?: string | null): Promise<T> {
-  const r = await fetch(`${API_BASE}${path}`, {
+  const r = await fetch(`${getApiBase()}${path}`, {
     cache: "no-store",
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
@@ -50,7 +63,7 @@ export async function apiSend<T>(
     ...(headers as Record<string, string>),
   };
   if (token) headerObj.Authorization = `Bearer ${token}`;
-  const r = await fetch(`${API_BASE}${path}`, {
+  const r = await fetch(`${getApiBase()}${path}`, {
     ...rest,
     headers: headerObj,
   });

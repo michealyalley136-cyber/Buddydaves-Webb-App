@@ -1,5 +1,24 @@
-Buddy Dave's — All URLs (local development)
+Buddy Dave's — All URLs
 ============================================
+
+LIVE SITE (Railway production):
+  https://web-production-3bbed.up.railway.app/
+
+Quick links (production):
+  Menu:         https://web-production-3bbed.up.railway.app/menu
+  Staff login:  https://web-production-3bbed.up.railway.app/staff/login
+  Admin:        https://web-production-3bbed.up.railway.app/admin
+  Owner guide:  https://web-production-3bbed.up.railway.app/owner-guide
+  API health:   https://web-production-3bbed.up.railway.app/api/health
+  Menu API:     https://web-production-3bbed.up.railway.app/api/menu
+  Menu ready:   https://web-production-3bbed.up.railway.app/api/health/menu
+
+(See PRODUCTION — Railway sections below for the full URL list.)
+
+
+================================================================================
+LOCAL DEVELOPMENT
+================================================================================
 Base website:  http://localhost:3000
 Base API:      http://localhost:4000
 
@@ -196,18 +215,143 @@ Service worker (PWA)
 
 
 ================================================================================
-PRODUCTION (replace localhost when you deploy)
+PRODUCTION — Railway (live)
 ================================================================================
-  Website:  https://YOUR-DOMAIN.com
-  API:      https://YOUR-API-DOMAIN.com   (or same domain with /api proxy)
-  Set NEXT_PUBLIC_API_URL on the web host if the API is on a separate origin.
+GitHub:  https://github.com/michealyalley136-cyber/Buddydaves-Webb-App
 
-  Customer:     https://YOUR-DOMAIN.com/menu
-  Owner guide:  https://YOUR-DOMAIN.com/owner-guide
-  Staff login:  https://YOUR-DOMAIN.com/staff/login
-  Admin:        https://YOUR-DOMAIN.com/admin
+Base website (Next.js):  https://web-production-3bbed.up.railway.app
+API (browser / proxy):   https://web-production-3bbed.up.railway.app/api/*
+                         (Next.js forwards /api/* to the Railway server service)
 
-See README.md for deploy notes.
+Server direct URL (if separate — set in Railway → server → Networking):
+  https://YOUR-SERVER-SERVICE.up.railway.app
+  Health check: https://YOUR-SERVER-SERVICE.up.railway.app/api/health
+
+Railway web env (reference):
+  CORS_ORIGIN on server should be: https://web-production-3bbed.up.railway.app
+  API_PROXY_TARGET / NEXT_PUBLIC_API_URL → your server Railway URL
+
+Deploy notes:  RAILWAY_DEPLOYMENT.md
+
+
+================================================================================
+PRODUCTION — CUSTOMER WEBSITE (public)
+================================================================================
+
+Homepage
+  https://web-production-3bbed.up.railway.app/
+
+Menu
+  https://web-production-3bbed.up.railway.app/menu
+
+Cart
+  https://web-production-3bbed.up.railway.app/cart
+
+Checkout
+  https://web-production-3bbed.up.railway.app/checkout
+
+Order confirmation (after placing order)
+  https://web-production-3bbed.up.railway.app/order/confirmation
+  https://web-production-3bbed.up.railway.app/order/confirmation?code=BD-XXXXXXXX-XXXX
+
+Track order
+  https://web-production-3bbed.up.railway.app/track-order
+  https://web-production-3bbed.up.railway.app/track-order?code=BD-XXXXXXXX-XXXX
+
+Our story
+  https://web-production-3bbed.up.railway.app/our-story
+
+Contact
+  https://web-production-3bbed.up.railway.app/contact
+
+Owner training guide (in-app only)
+  https://web-production-3bbed.up.railway.app/owner-guide
+
+Homepage anchor (pickup & drive-thru)
+  https://web-production-3bbed.up.railway.app/#drive-thru
+
+Welcome audio (first visit)
+  https://web-production-3bbed.up.railway.app/media/buddy-daves-welcome-loop.mp3
+
+
+================================================================================
+PRODUCTION — STAFF & KITCHEN
+================================================================================
+
+Staff login
+  https://web-production-3bbed.up.railway.app/staff/login
+
+Staff root
+  https://web-production-3bbed.up.railway.app/staff
+
+Staff dashboard — active orders
+  https://web-production-3bbed.up.railway.app/staff/dashboard
+
+Staff dashboard — completed orders
+  https://web-production-3bbed.up.railway.app/staff/dashboard?view=completed
+
+Staff dashboard — alert settings
+  https://web-production-3bbed.up.railway.app/staff/dashboard?view=settings
+
+Staff dashboard — audit (placeholder)
+  https://web-production-3bbed.up.railway.app/staff/dashboard?view=audit
+
+
+================================================================================
+PRODUCTION — ADMIN PANEL
+================================================================================
+
+Admin dashboard
+  https://web-production-3bbed.up.railway.app/admin
+
+Admin menu
+  https://web-production-3bbed.up.railway.app/admin/menu
+
+Admin categories
+  https://web-production-3bbed.up.railway.app/admin/categories
+
+Admin orders
+  https://web-production-3bbed.up.railway.app/admin/orders
+
+Admin reports (placeholder)
+  https://web-production-3bbed.up.railway.app/admin/reports
+
+Admin settings (placeholder)
+  https://web-production-3bbed.up.railway.app/admin/settings
+
+
+================================================================================
+PRODUCTION — API (via web proxy — same origin in browser)
+================================================================================
+
+Health
+  https://web-production-3bbed.up.railway.app/api/health
+
+Database health
+  https://web-production-3bbed.up.railway.app/api/health/db
+
+Public menu (GET)
+  https://web-production-3bbed.up.railway.app/api/menu
+
+Create order (POST)
+  https://web-production-3bbed.up.railway.app/api/orders
+
+Track order (GET)
+  https://web-production-3bbed.up.railway.app/api/orders/{code}
+
+Staff login (POST)
+  https://web-production-3bbed.up.railway.app/api/auth/login
+
+
+================================================================================
+PRODUCTION — STATIC ASSETS
+================================================================================
+
+Logo
+  https://web-production-3bbed.up.railway.app/images/buddy-daves-logo.png
+
+PWA manifest
+  https://web-production-3bbed.up.railway.app/manifest.webmanifest
 
 
 ================================================================================

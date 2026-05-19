@@ -21,8 +21,14 @@ const nextConfig: NextConfig = {
    * Railway: set API_PROXY_TARGET to your server service URL before `npm run build`.
    */
   async rewrites() {
-    const api = process.env.API_PROXY_TARGET ?? "http://localhost:4000";
-    return [{ source: "/api/:path*", destination: `${api}/api/:path*` }];
+    const api =
+      process.env.API_PROXY_TARGET?.trim() ||
+      process.env.API_URL?.trim() ||
+      process.env.NEXT_PUBLIC_API_URL?.trim() ||
+      "http://localhost:4000";
+    const base = api.replace(/\/$/, "");
+    console.log(`[web] Rewrite proxy target: ${base}`);
+    return [{ source: "/api/:path*", destination: `${base}/api/:path*` }];
   },
   images: {
     dangerouslyAllowSVG: true,
